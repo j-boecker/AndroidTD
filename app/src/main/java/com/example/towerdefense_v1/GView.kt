@@ -11,34 +11,33 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
 
     val backPaint = Paint()
-    private var imagesArcher : MutableMap <String, Bitmap> = mutableMapOf()
-    var tower1 : Tower
-    var tower2 : Tower
-   var towerBuildGrid : Array<Array<Tower?>>
-
-    val gridWidth: Int = 10
-    val gridHeight: Int = 10
-
+    var imagesArcher: MutableMap<String, Bitmap> = mutableMapOf()
     private val thread: GameThread
+    val imageGrass: Bitmap
+    val paintBig = Paint()
+    val paintLines = Paint()
+    var screenWidth = Resources.getSystem().displayMetrics.widthPixels.toFloat()
+    var screenHeight = Resources.getSystem().displayMetrics.heightPixels.toFloat()
+
     init {
 
+        paintLines.color = Color.LTGRAY
+        //paintLines.alpha = 100
+
+        paintBig.isAntiAlias = true
+        paintBig.isFilterBitmap = true
+        paintBig.isDither = true
         backPaint.setColor(Color.RED)
         // putting the images in a map containing all bitmaps. Here a String Constant resource could be used to avoid spelling mistakes
         imagesArcher.put(GConst.IDLE_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe1))
-        imagesArcher.put(GConst.IDLE_IMAGE2, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe2))
+        imagesArcher.put(GConst.IDLE_IMAGE2,  BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe2))
         imagesArcher.put(GConst.PROJECTILE_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_arrow))
         imagesArcher.put(GConst.SHADOW_IMAGE, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shadow))
         imagesArcher.put(GConst.SHOOT_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shoot1))
         imagesArcher.put(GConst.SHOOT_IMAGE2, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shoot2))
         imagesArcher.put(GConst.SHOOT_IMAGE3, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shoot3))
+        imageGrass = BitmapFactory.decodeResource(ctx.resources, R.drawable.grass)
 
-        //making a 2d array tile grid in kotlin is terrible
-        towerBuildGrid = Array(GConst.TOWERGRIDWIDTH) {Array<Tower?>(GConst.TOWERGRIDHEIGHT){null}}
-
-
-        tower1 = TowerArcher(imagesArcher,50f,50f)
-        tower2 = TowerArcher(imagesArcher,400f,400f)
-        towerBuildGrid[5][5] = tower2
         holder.addCallback(this)
         thread = GameThread(holder, this)
 
@@ -48,7 +47,11 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
         thread.setRunning(true)
         thread.start()
-        Toast.makeText(this@GView.context,"version 1.2" + Resources.getSystem().displayMetrics.widthPixels + "  Y  " +  Resources.getSystem().displayMetrics.heightPixels, Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this@GView.context,
+            "v1.3 -- X: " + Resources.getSystem().displayMetrics.widthPixels + " Y: " + Resources.getSystem().displayMetrics.heightPixels,
+            Toast.LENGTH_LONG
+        ).show()
 
     }
 
@@ -70,21 +73,22 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
         }
     }
 
-    fun update() {
-        for( tList in towerBuildGrid){
-            for(tw in tList){
-                tw?.update()
-            }
-        }
-    }
 
-    //using override draw. Dont know if a new method like drawScreen() would be better
-    override fun draw(canvas: Canvas) {
+    override fun draw(canvas: Canvas?) {
         super.draw(canvas)
-        for( tList in towerBuildGrid){
-            for(tw in tList){
-                    tw?.draw(canvas)
-            }
+        screenWidth = Resources.getSystem().displayMetrics.widthPixels.toFloat()
+        screenHeight = Resources.getSystem().displayMetrics.heightPixels.toFloat()
+        if(screenHeight<screenWidth)
+            screenWidth = screenWidth*0.8f
+        else
+            screenHeight = screenHeight*0.8f
+
+        canvas?.drawBitmap(imageGrass, 0f, 0f, paintBig)
+        for (i in 1..GConst.TOWERGRIDWIDTH){
+            canvas?.drawLine(i*(screenWidth/GConst.TOWERGRIDWIDTH),0f,i*(screenWidth/GConst.TOWERGRIDWIDTH),screenHeight,paintLines)
+        }
+        for (i in 1..GConst.TOWERGRIDHEIGHT){
+            canvas?.drawLine(0f,i*(screenHeight/GConst.TOWERGRIDHEIGHT),screenWidth,i*(screenHeight/GConst.TOWERGRIDHEIGHT),paintLines)
         }
     }
 }

@@ -1,4 +1,5 @@
 package com.example.towerdefense_v1
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.SurfaceHolder
 import java.lang.Exception
@@ -8,6 +9,33 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
     private var running : Boolean = false
     private val targetFPS = 50
     lateinit var canvas: Canvas
+
+    var towerBuildGrid: Array<Array<Tower?>>
+    var imagesArcher: MutableMap<String, Bitmap> = mutableMapOf()
+
+    init{
+        imagesArcher = gameView.imagesArcher
+        //making a 2d array tile grid in kotlin is terrible
+        towerBuildGrid = Array(GConst.TOWERGRIDWIDTH) { Array<Tower?>(GConst.TOWERGRIDHEIGHT) { null } }
+        createTower(0,0,"Archer")
+        createTower(0,1,"Archer")
+        createTower(0,2,"Archer")
+        createTower(0,3,"Archer")
+        createTower(0,4,"Archer")
+        createTower(0,5,"Archer")
+        createTower(0,6,"Archer")
+        createTower(0,7,"Archer")
+        createTower(0,8,"Archer")
+        createTower(0,9,"Archer")
+        createTower(1,9,"Archer")
+        createTower(2,9,"Archer")
+        createTower(3,9,"Archer")
+        createTower(4,9,"Archer")
+        createTower(5,9,"Archer")
+        createTower(6,9,"Archer")
+        createTower(7,9,"Archer")
+
+    }
 
     fun setRunning(running: Boolean){
         this.running = running
@@ -26,8 +54,9 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
                 canvas = this.surfaceHolder.lockCanvas()
 
                 synchronized(surfaceHolder){
-                    this.gameView.update()
                     this.gameView.draw(canvas)
+                    this.draw(canvas)
+                    this.update()
                 }
             }
             catch (e : Exception){
@@ -52,4 +81,26 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
         }
     }
 
+    fun update(){
+        for (tList in towerBuildGrid) {
+            for (tw in tList) {
+                tw?.update()
+            }
+        }
+    }
+
+   fun draw(canvas: Canvas) {
+
+        for (tList in towerBuildGrid) {
+            for (tw in tList) {
+                tw?.draw(canvas)
+            }
+        }
+    }
+
+    fun createTower(xGrid: Int,yGrid: Int, towerName: String){
+        when(towerName){
+            "Archer" ->{towerBuildGrid[xGrid][yGrid] = TowerArcher(imagesArcher, xGrid*67f, yGrid*GConst.CELLSIZE.toFloat()) }
+        }
+    }
 }
