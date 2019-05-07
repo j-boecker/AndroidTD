@@ -11,7 +11,8 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
 
     val backPaint = Paint()
-    var imagesArcher: MutableMap<String, Bitmap> = mutableMapOf()
+    var imagesArcher : MutableMap<String, Bitmap> = mutableMapOf()
+    var imagesCreep : MutableMap<String, Bitmap> = mutableMapOf()
     private val thread: GameThread
     val imageGrass: Bitmap
     val paintBig = Paint()
@@ -29,6 +30,8 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
         paintBig.isDither = true
         backPaint.setColor(Color.RED)
         // putting the images in a map containing all bitmaps. Here a String Constant resource could be used to avoid spelling mistakes
+        imagesCreep.put(GConst.CREEP_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.creepright1))
+
         imagesArcher.put(GConst.IDLE_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe1))
         imagesArcher.put(GConst.IDLE_IMAGE2,  BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe2))
         imagesArcher.put(GConst.PROJECTILE_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_arrow))

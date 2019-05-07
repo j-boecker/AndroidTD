@@ -22,4 +22,5 @@ abstract class Sprite(val images: Map<String, Bitmap>, var x: Float, var y: Floa
     abstract fun draw(canvas: Canvas)
 
     abstract fun update()
+
 }

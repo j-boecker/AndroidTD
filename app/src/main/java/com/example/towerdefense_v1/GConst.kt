@@ -9,6 +9,8 @@ object GConst {
     const val SHOOT_IMAGE3 = "shoot3"
     const val PROJECTILE_IMAGE1 = "projectile1"
 
+    const val CREEP_IMAGE1 = "creep1"
+
     const val GRIDHEIGHT : Int = 500
     const val GRIDWIDTH : Int = 500
     const val TOWERGRIDHEIGHT : Int = 10

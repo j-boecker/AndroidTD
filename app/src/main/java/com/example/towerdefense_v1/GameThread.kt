@@ -10,13 +10,22 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
     private val targetFPS = 50
     lateinit var canvas: Canvas
 
+    var spriteList: MutableList<Sprite>
     var towerBuildGrid: Array<Array<Tower?>>
+
+
     var imagesArcher: MutableMap<String, Bitmap> = mutableMapOf()
+    var imagesCreep: MutableMap<String, Bitmap> = mutableMapOf()
+
 
     init{
         imagesArcher = gameView.imagesArcher
+        imagesCreep = gameView.imagesCreep
+
+        spriteList = mutableListOf<Sprite>()
         //making a 2d array tile grid in kotlin is terrible
         towerBuildGrid = Array(GConst.TOWERGRIDWIDTH) { Array<Tower?>(GConst.TOWERGRIDHEIGHT) { null } }
+
         createTower(0,0,"Archer")
         createTower(0,1,"Archer")
         createTower(0,2,"Archer")
@@ -34,6 +43,9 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
         createTower(5,9,"Archer")
         createTower(6,9,"Archer")
         createTower(7,9,"Archer")
+
+        createCreep()
+
 
     }
 
@@ -87,6 +99,9 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
                 tw?.update()
             }
         }
+        for(s in spriteList){
+            s.update()
+        }
     }
 
    fun draw(canvas: Canvas) {
@@ -96,11 +111,19 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
                 tw?.draw(canvas)
             }
         }
+       for(s in spriteList){
+           s.draw(canvas)
+       }
     }
 
     fun createTower(xGrid: Int,yGrid: Int, towerName: String){
         when(towerName){
             "Archer" ->{towerBuildGrid[xGrid][yGrid] = TowerArcher(imagesArcher, xGrid*67f, yGrid*GConst.CELLSIZE.toFloat()) }
         }
+    }
+
+    fun createCreep(){
+        var creep = Creep(imagesCreep, 50f, 50f, 10f, 2f)
+        spriteList.add(creep)
     }
 }
