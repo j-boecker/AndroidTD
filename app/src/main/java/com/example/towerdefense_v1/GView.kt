@@ -9,11 +9,10 @@ import android.widget.Toast
 
 class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
-
+    private val thread: GameThread
     val backPaint = Paint()
     var imagesArcher : MutableMap<String, Bitmap> = mutableMapOf()
     var imagesCreep : MutableMap<String, Bitmap> = mutableMapOf()
-    private val thread: GameThread
     val imageGrass: Bitmap
     val paintBig = Paint()
     val paintLines = Paint()
@@ -48,8 +47,12 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
     override fun surfaceCreated(holder: SurfaceHolder) {
 
-        thread.setRunning(true)
-        thread.innerThread.start()
+        if (!thread.getRunning()){
+            thread.setRunning(true)
+            thread.innerThread.start()
+        }
+
+        thread.surfaceActive = true
         Toast.makeText(
             this@GView.context,
             "v1.3 -- X: " + Resources.getSystem().displayMetrics.widthPixels + " Y: " + Resources.getSystem().displayMetrics.heightPixels,
@@ -63,7 +66,9 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-        var retry = true
+
+        thread.surfaceActive = false
+      /*  var retry = true
         while (retry) {
             try {
                 thread.setRunning(false)
@@ -73,7 +78,7 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
             }
 
             retry = false
-        }
+        }*/
     }
 
 
