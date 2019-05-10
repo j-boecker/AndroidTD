@@ -12,7 +12,7 @@ object GConst {
     const val CREEP_IMAGE1 = "creep1"
 
     const val GRIDHEIGHT : Int = 500
-    const val GRIDWIDTH : Int = 500
+    const val GRIDWIDTH : Int = 400
     const val TOWERGRIDHEIGHT : Int = 10
     const val TOWERGRIDWIDTH : Int = 8
     const val CELLSIZE : Int = 50

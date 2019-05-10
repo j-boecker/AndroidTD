@@ -1,14 +1,17 @@
 package com.example.towerdefense_v1
+import android.app.Service
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.SurfaceHolder
 import java.lang.Exception
 
-class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thread() {
+class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView){
+
 
     private var running : Boolean = false
     private val targetFPS = 50
     lateinit var canvas: Canvas
+    val innerThread = InnerThread()
 
     var spriteList: MutableList<Sprite>
     var towerBuildGrid: Array<Array<Tower?>>
@@ -27,12 +30,8 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
         towerBuildGrid = Array(GConst.TOWERGRIDWIDTH) { Array<Tower?>(GConst.TOWERGRIDHEIGHT) { null } }
 
         createTower(0,0,"Archer")
-        createTower(0,1,"Archer")
-        createTower(0,2,"Archer")
         createTower(0,3,"Archer")
         createTower(0,4,"Archer")
-        createTower(0,5,"Archer")
-        createTower(0,6,"Archer")
         createTower(0,7,"Archer")
         createTower(0,8,"Archer")
         createTower(0,9,"Archer")
@@ -53,44 +52,47 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
         this.running = running
     }
 
-    override fun run() {
-        var startTime : Long
-        var timeMillis : Long
-        var waitTime : Long
-        val targetTime = ( 1000 / targetFPS).toLong()
+    inner class InnerThread : Thread(){
+        override fun run() {
+            var startTime : Long
+            var timeMillis : Long
+            var waitTime : Long
+            val targetTime = ( 1000 / targetFPS).toLong()
 
-        while(running){
-            startTime = System.nanoTime()
+            while(running){
+                startTime = System.nanoTime()
 
-            try {
-                canvas = this.surfaceHolder.lockCanvas()
+                try {
+                    canvas = surfaceHolder.lockCanvas()
 
-                synchronized(surfaceHolder){
-                    this.gameView.draw(canvas)
-                    this.draw(canvas)
-                    this.update()
+                    synchronized(surfaceHolder){
+                        gameView.draw(canvas)
+                        draw(canvas)
+                        update()
+                    }
                 }
-            }
-            catch (e : Exception){
-                e.printStackTrace()
-            }
-            finally{
+                catch (e : Exception){
+                    e.printStackTrace()
+                }
+                finally{
                     try{
                         surfaceHolder.unlockCanvasAndPost(canvas)
                     }
                     catch( e : Exception){
                         e.printStackTrace()
                     }
-            }
-            timeMillis = (System.nanoTime() - startTime) / 1000000
-            waitTime = targetTime - timeMillis
+                }
+                timeMillis = (System.nanoTime() - startTime) / 1000000
+                waitTime = targetTime - timeMillis
 
-            try{
-                sleep(waitTime)
-            }catch (e: Exception){
-                e.printStackTrace()
+                try{
+                    sleep(waitTime)
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
             }
         }
+
     }
 
     fun update(){
@@ -102,6 +104,7 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
         for(s in spriteList){
             s.update()
         }
+        creepLoop()
     }
 
    fun draw(canvas: Canvas) {
@@ -121,9 +124,17 @@ class GameThread(val surfaceHolder : SurfaceHolder, val gameView : GView) : Thre
             "Archer" ->{towerBuildGrid[xGrid][yGrid] = TowerArcher(imagesArcher, xGrid*67f, yGrid*GConst.CELLSIZE.toFloat()) }
         }
     }
-
+    var  creepTimer = 0f
+    fun creepLoop(){
+        if (creepTimer>100){
+            createCreep()
+            creepTimer = 0f
+        }
+        creepTimer++
+    }
     fun createCreep(){
-        var creep = Creep(imagesCreep, 50f, 50f, 10f, 2f)
+        var path = mutableListOf(Direction.RIGHT,Direction.RIGHT,Direction.RIGHT,Direction.RIGHT,Direction.DOWN,Direction.DOWN,Direction.DOWN,Direction.LEFT,Direction.LEFT,Direction.UP,Direction.UP)
+        var creep = Creep(imagesCreep, 50f, 50f, 10f, 2f,path)
         spriteList.add(creep)
     }
 }

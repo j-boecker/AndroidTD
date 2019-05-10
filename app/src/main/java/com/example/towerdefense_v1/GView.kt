@@ -49,7 +49,7 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
     override fun surfaceCreated(holder: SurfaceHolder) {
 
         thread.setRunning(true)
-        thread.start()
+        thread.innerThread.start()
         Toast.makeText(
             this@GView.context,
             "v1.3 -- X: " + Resources.getSystem().displayMetrics.widthPixels + " Y: " + Resources.getSystem().displayMetrics.heightPixels,
@@ -67,7 +67,7 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
         while (retry) {
             try {
                 thread.setRunning(false)
-                thread.join()
+                thread.innerThread.join()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
