@@ -27,6 +27,7 @@ class GameThread() : Service() {
     var imgLoader: ImageLoader
 
     var spriteList: MutableList<Sprite>
+    var creepList: MutableList<Creep>
     var towerBuildGrid: Array<Array<Tower?>>
 
 
@@ -41,22 +42,15 @@ class GameThread() : Service() {
         imagesCreep = imgLoader.imagesCreep
 
         spriteList = mutableListOf<Sprite>()
+        creepList = mutableListOf<Creep>()
         //making a 2d array tile grid in kotlin is terrible
         towerBuildGrid = Array(GConst.TOWERGRIDWIDTH) { Array<Tower?>(GConst.TOWERGRIDHEIGHT) { null } }
 
-        createTower(0, 0, "Archer")
         createTower(0, 3, "Archer")
-        createTower(0, 4, "Archer")
-        createTower(0, 7, "Archer")
-        createTower(0, 8, "Archer")
-        createTower(0, 9, "Archer")
-        createTower(1, 9, "Archer")
-        createTower(2, 9, "Archer")
-        createTower(3, 9, "Archer")
-        createTower(4, 9, "Archer")
-        createTower(5, 9, "Archer")
-        createTower(6, 9, "Archer")
+
         createTower(7, 9, "Archer")
+
+        createCreep()
     }
 
     fun setRunning(running: Boolean) {
@@ -135,7 +129,10 @@ class GameThread() : Service() {
         for (s in spriteList) {
             s.update()
         }
-        creepLoop()
+        for (c in creepList) {
+            c.update()
+        }
+        //creepLoop()
     }
 
     fun draw(canvas: Canvas) {
@@ -148,13 +145,16 @@ class GameThread() : Service() {
             for (s in spriteList) {
                 s.draw(canvas)
             }
+            for (c in creepList) {
+                c.draw(canvas)
+            }
         }
     }
 
     fun createTower(xGrid: Int, yGrid: Int, towerName: String) {
         when (towerName) {
             "Archer" -> {
-                towerBuildGrid[xGrid][yGrid] = TowerArcher(imagesArcher, xGrid * 67f, yGrid * GConst.CELLSIZE.toFloat())
+                towerBuildGrid[xGrid][yGrid] = TowerArcher(imagesArcher,spriteList,creepList, xGrid * 67f, yGrid * GConst.CELLSIZE.toFloat())
             }
         }
     }

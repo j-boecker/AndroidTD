@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 
 
-class Creep(images: Map<String, Bitmap>, x : Float, y : Float, var maxHp: Float, var speed: Float, var path: MutableList<Direction>) : Sprite(images,x,y) {
+class Creep(images: Map<String, Bitmap>, x : Float, y : Float, var hitPoints: Float, var speed: Float, var path: MutableList<Direction>) : Sprite(images,x,y) {
 
     var matrix: Matrix = Matrix()
     var timer: Float = 0f
@@ -23,6 +23,9 @@ class Creep(images: Map<String, Bitmap>, x : Float, y : Float, var maxHp: Float,
 
     override fun update() {
         move()
+    }
+    fun takeDamage(damage: Float){
+        hitPoints -= damage
     }
 
     fun move(){
