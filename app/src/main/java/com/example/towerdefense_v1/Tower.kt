@@ -24,24 +24,22 @@ open class Tower(
 
     override fun update() {
 
-        if(shootTriggerTimer>shootSpeed){
+        if (shootTriggerTimer > shootSpeed) {
             cooldown = false
         }
-        if(lockedCreep == null){
+        if (lockedCreep == null) {
 
-            if(getDistanceToCreep(getClosestCreep())< shootRange){
+            if (getDistanceToCreep(getClosestCreep()) < shootRange) {
                 lockedCreep = getClosestCreep()
             }
-        }
-        else{
+        } else {
             // if the creep runs out of range
-            if(getDistanceToCreep(lockedCreep) > shootRange){
+            if (getDistanceToCreep(lockedCreep) > shootRange) {
                 lockedCreep = getClosestCreep()
             }
             // shoots only of the tower is not on cooldown
-            else if(!cooldown)
-            {
-                if(lockedCreep != null){
+            else if (!cooldown) {
+                if (lockedCreep != null) {
 
                     this.shoot(lockedCreep!!)
                     shootTriggerTimer = 0f
@@ -55,7 +53,7 @@ open class Tower(
 
 
     fun shoot(targetCreep: Creep) {
-        val projectile = Projectile(images,this.x + (this.width / 2),this.y + (this.height / 2),5f,5f,creepList)
+        val projectile = Projectile(images, this.x + (this.width / 2), this.y + (this.height / 2), 5f, 5f, creepList)
         projectile.creep = targetCreep
         spriteList.add(projectile)
     }
@@ -67,7 +65,10 @@ open class Tower(
                 Math.pow(
                     ((this.x + this.width / 2) - (currentCreep!!.x - currentCreep!!.width / 2)).toDouble(),
                     2.0
-                ) + Math.pow(((this.y + this.height / 2) - (currentCreep!!.y - currentCreep!!.height / 2)).toDouble(), 2.0)
+                ) + Math.pow(
+                    ((this.y + this.height / 2) - (currentCreep!!.y - currentCreep!!.height / 2)).toDouble(),
+                    2.0
+                )
             )
         }
         return distance
@@ -75,15 +76,15 @@ open class Tower(
 
     fun getClosestCreep(): Creep? {
         var closestCreep: Creep? = null
-        var distance : Double
+        var distance: Double
         var shortestDistance = Double.MAX_VALUE
-      for (c in creepList){
-          distance = getDistanceToCreep(c)
-          if(distance<shortestDistance){
-              closestCreep = c
-              shortestDistance = distance
-          }
-      }
+        for (c in creepList) {
+            distance = getDistanceToCreep(c)
+            if (distance < shortestDistance) {
+                closestCreep = c
+                shortestDistance = distance
+            }
+        }
         return closestCreep
     }
 }

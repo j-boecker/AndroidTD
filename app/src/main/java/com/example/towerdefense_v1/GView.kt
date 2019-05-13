@@ -27,15 +27,16 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
             this@GView.gameThread = ((binder as GameThread.GameServiceBinder).getService())
             this@GView.gameThread.gameView = this@GView
             this@GView.gameThread.surfaceHolder = this@GView.holder
-            if(!this@GView.gameThread.getRunning()){
+            if (!this@GView.gameThread.getRunning()) {
                 this@GView.gameThread.setRunning(true)
                 this@GView.gameThread.innerThread.start()
             }
             this@GView.gameThread.surfaceActive = true
-            Toast.makeText(context, "service connected",Toast.LENGTH_SHORT)
+            Toast.makeText(context, "service connected", Toast.LENGTH_SHORT)
         }
+
         override fun onServiceDisconnected(p0: ComponentName?) {
-            Toast.makeText(context, "service disconnected",Toast.LENGTH_LONG)
+            Toast.makeText(context, "service disconnected", Toast.LENGTH_LONG)
         }
     }
 
@@ -55,20 +56,20 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
     override fun surfaceCreated(holder: SurfaceHolder) {
 
-        if(!serviceStarted){
+        if (!serviceStarted) {
             val startIntent = Intent(context, GameThread::class.java)
             context.startService(startIntent)
             serviceStarted = true
             //bind service
 
         }
-        val bindIntent = Intent(context,GameThread::class.java)
+        val bindIntent = Intent(context, GameThread::class.java)
         context.bindService(bindIntent, serviceConn, Context.BIND_AUTO_CREATE)
 
         this.setOnTouchListener { view, motionEvent ->
-            var xGrid = (motionEvent.x/screenWidth)*GConst.TOWERGRIDWIDTH
-            var yGrid = (motionEvent.y/screenWidth)*GConst.TOWERGRIDWIDTH
-            this@GView.gameThread.createTower(xGrid.toInt(),yGrid.toInt(),"Archer")
+            var xGrid = (motionEvent.x / screenWidth) * GConst.TOWERGRIDWIDTH
+            var yGrid = (motionEvent.y / screenWidth) * GConst.TOWERGRIDWIDTH
+            this@GView.gameThread.createTower(xGrid.toInt(), yGrid.toInt(), "Archer")
             true
         }
 
@@ -78,8 +79,8 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-       this@GView.gameThread.surfaceActive = false
-       context.unbindService(serviceConn)
+        this@GView.gameThread.surfaceActive = false
+        context.unbindService(serviceConn)
     }
 
 
@@ -87,17 +88,29 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
         super.draw(canvas)
         screenWidth = Resources.getSystem().displayMetrics.widthPixels.toFloat()
         screenHeight = Resources.getSystem().displayMetrics.heightPixels.toFloat()
-        if(screenHeight<screenWidth)
-            screenWidth = screenWidth*0.8f
+        if (screenHeight < screenWidth)
+            screenWidth = screenWidth * 0.8f
         else
-            screenHeight = screenHeight*0.8f
+            screenHeight = screenHeight * 0.8f
 
         canvas?.drawBitmap(imageGrass, 0f, 0f, paintBig)
-        for (i in 1..GConst.TOWERGRIDWIDTH){
-            canvas?.drawLine(i*(screenWidth/GConst.TOWERGRIDWIDTH),0f,i*(screenWidth/GConst.TOWERGRIDWIDTH),screenHeight,paintLines)
+        for (i in 1..GConst.TOWERGRIDWIDTH) {
+            canvas?.drawLine(
+                i * (screenWidth / GConst.TOWERGRIDWIDTH),
+                0f,
+                i * (screenWidth / GConst.TOWERGRIDWIDTH),
+                screenHeight,
+                paintLines
+            )
         }
-        for (i in 1..GConst.TOWERGRIDHEIGHT){
-            canvas?.drawLine(0f,i*(screenHeight/GConst.TOWERGRIDHEIGHT),screenWidth,i*(screenHeight/GConst.TOWERGRIDHEIGHT),paintLines)
+        for (i in 1..GConst.TOWERGRIDHEIGHT) {
+            canvas?.drawLine(
+                0f,
+                i * (screenHeight / GConst.TOWERGRIDHEIGHT),
+                screenWidth,
+                i * (screenHeight / GConst.TOWERGRIDHEIGHT),
+                paintLines
+            )
         }
     }
 }

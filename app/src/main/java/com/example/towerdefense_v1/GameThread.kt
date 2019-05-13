@@ -11,7 +11,7 @@ import java.lang.Exception
 
 class GameThread() : Service() {
     override fun onBind(intent: Intent?): IBinder? {
-       return GameServiceBinder()
+        return GameServiceBinder()
     }
 
     lateinit var surfaceHolder: SurfaceHolder
@@ -56,14 +56,13 @@ class GameThread() : Service() {
     fun setRunning(running: Boolean) {
         this.running = running
     }
-    fun getRunning(): Boolean{
+
+    fun getRunning(): Boolean {
         return this.running
     }
 
-    inner class GameServiceBinder : Binder()
-    {
-        fun getService() : GameThread
-        {
+    inner class GameServiceBinder : Binder() {
+        fun getService(): GameThread {
             return this@GameThread
         }
     }
@@ -76,7 +75,7 @@ class GameThread() : Service() {
             val targetTime = (1000 / targetFPS).toLong()
 
             while (running) {
-                if(surfaceActive){
+                if (surfaceActive) {
                     startTime = System.nanoTime()
                     try {
                         canvas = surfaceHolder.lockCanvas()
@@ -99,12 +98,11 @@ class GameThread() : Service() {
                     waitTime = targetTime - timeMillis
 
                     try {
-                        sleep(Math.max(0,waitTime))
+                        sleep(Math.max(0, waitTime))
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                }
-                else{
+                } else {
                     startTime = System.nanoTime()
                     update()
                     timeMillis = (System.nanoTime() - startTime) / 1000000
@@ -128,29 +126,27 @@ class GameThread() : Service() {
             }
         }
         for (s in spriteList) {
-            if(s.isDisposable){
-             garbageSpriteIndex = spriteList.indexOf(s)
-            }
-            else{
+            if (s.isDisposable) {
+                garbageSpriteIndex = spriteList.indexOf(s)
+            } else {
                 s.update()
             }
         }
-        if(garbageSpriteIndex != -1){
+        if (garbageSpriteIndex != -1) {
             spriteList.removeAt(garbageSpriteIndex)
             garbageSpriteIndex = -1
         }
         for (c in creepList) {
 
-            if(c.isDisposable){
+            if (c.isDisposable) {
                 garbageSpriteIndex = creepList.indexOf(c)
-            }
-            else{
+            } else {
                 c.update()
             }
         }
 
-        if(garbageSpriteIndex != -1){
-           creepList.removeAt(garbageSpriteIndex)
+        if (garbageSpriteIndex != -1) {
+            creepList.removeAt(garbageSpriteIndex)
             garbageSpriteIndex = -1
         }
         creepLoop()
@@ -175,7 +171,8 @@ class GameThread() : Service() {
     fun createTower(xGrid: Int, yGrid: Int, towerName: String) {
         when (towerName) {
             "Archer" -> {
-                towerBuildGrid[xGrid][yGrid] = TowerArcher(imagesArcher,spriteList,creepList, xGrid * 67f, yGrid * GConst.CELLSIZE.toFloat())
+                towerBuildGrid[xGrid][yGrid] =
+                    TowerArcher(imagesArcher, spriteList, creepList, xGrid * 67f, yGrid * GConst.CELLSIZE.toFloat())
             }
         }
     }

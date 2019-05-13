@@ -3,7 +3,7 @@ package com.example.towerdefense_v1
 import android.app.Application
 import android.content.Context
 
-public class ApplicationContextProvider : Application() {
+class ApplicationContextProvider : Application() {
     init {
         instance = this
     }

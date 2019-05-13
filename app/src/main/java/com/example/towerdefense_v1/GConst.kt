@@ -10,10 +10,18 @@ object GConst {
     const val PROJECTILE_IMAGE1 = "projectile1"
 
     const val CREEP_IMAGE1 = "creep1"
+    const val CREEP_IMAGE2 = "creep2"
+    const val CREEP_IMAGE3 = "creep3"
+    const val CREEP_IMAGE4 = "creep4"
+    const val CREEP_IMAGE5 = "creep5"
+    const val CREEP_IMAGE6 = "creep6"
+    const val CREEP_IMAGE7 = "creep7"
+    const val CREEP_IMAGE8 = "creep8"
+    const val CREEP_IMAGE9 = "creep9"
 
-    const val GRIDHEIGHT : Int = 500
-    const val GRIDWIDTH : Int = 400
-    const val TOWERGRIDHEIGHT : Int = 10
-    const val TOWERGRIDWIDTH : Int = 8
-    const val CELLSIZE : Int = 50
+    const val GRIDHEIGHT: Int = 500
+    const val GRIDWIDTH: Int = 400
+    const val TOWERGRIDHEIGHT: Int = 10
+    const val TOWERGRIDWIDTH: Int = 8
+    const val CELLSIZE: Int = 50
 }

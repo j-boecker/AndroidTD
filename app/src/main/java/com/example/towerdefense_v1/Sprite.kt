@@ -26,13 +26,13 @@ abstract class Sprite(val images: Map<String, Bitmap>, var x: Float, var y: Floa
     }
 
     fun collidesWith(sprite: Sprite): Boolean {
-        return(x <= sprite.x + sprite.width && x + width >= sprite.x && y <= sprite.y + sprite.height && y + height >= sprite.y)
+        return (x <= sprite.x + sprite.width && x + width >= sprite.x && y <= sprite.y + sprite.height && y + height >= sprite.y)
     }
 
-    fun move(distanceX: Float, distanceY : Float){
+    fun move(distanceX: Float, distanceY: Float) {
         //save method to exceed grid boundaries with moving
-        x  = Math.min(Math.max(0f,x+distanceX),GConst.GRIDWIDTH.toFloat())
-        y  = Math.min(Math.max(0f,x+distanceY),GConst.GRIDWIDTH.toFloat())
+        x = Math.min(Math.max(0f, x + distanceX), GConst.GRIDWIDTH.toFloat())
+        y = Math.min(Math.max(0f, x + distanceY), GConst.GRIDWIDTH.toFloat())
     }
 
     abstract fun draw(canvas: Canvas)
