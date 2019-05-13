@@ -9,17 +9,22 @@ import android.os.IBinder
 import android.view.SurfaceHolder
 import java.lang.Exception
 
-class GameThread(val surfaceHolder: SurfaceHolder, val gameView: GView) : Service() {
-    override fun onBind(p0: Intent?): IBinder? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+class GameThread() : Service() {
+    override fun onBind(intent: Intent?): IBinder? {
+       return GameServiceBinder()
     }
 
+    lateinit var surfaceHolder: SurfaceHolder
+    lateinit var gameView: GView
 
     private var running: Boolean = false
     private val targetFPS = 50
     lateinit var canvas: Canvas
     val innerThread = InnerThread()
     var surfaceActive = false
+
+    //class to outsource loading images from drawable
+    var imgLoader: ImageLoader
 
     var spriteList: MutableList<Sprite>
     var towerBuildGrid: Array<Array<Tower?>>
@@ -30,8 +35,10 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameView: GView) : Servic
 
 
     init {
-        imagesArcher = gameView.imagesArcher
-        imagesCreep = gameView.imagesCreep
+
+        imgLoader = ImageLoader()
+        imagesArcher = imgLoader.imagesArcher
+        imagesCreep = imgLoader.imagesCreep
 
         spriteList = mutableListOf<Sprite>()
         //making a 2d array tile grid in kotlin is terrible
@@ -50,10 +57,6 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameView: GView) : Servic
         createTower(5, 9, "Archer")
         createTower(6, 9, "Archer")
         createTower(7, 9, "Archer")
-
-        createCreep()
-
-
     }
 
     fun setRunning(running: Boolean) {
@@ -61,6 +64,14 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameView: GView) : Servic
     }
     fun getRunning(): Boolean{
         return this.running
+    }
+
+    inner class GameServiceBinder : Binder()
+    {
+        fun getService() : GameThread
+        {
+            return this@GameThread
+        }
     }
 
     inner class InnerThread : Thread() {
@@ -71,36 +82,48 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameView: GView) : Servic
             val targetTime = (1000 / targetFPS).toLong()
 
             while (running) {
-                startTime = System.nanoTime()
-
-                try {
-                    canvas = surfaceHolder.lockCanvas()
-
-                    synchronized(surfaceHolder) {
-                        gameView.draw(canvas)
-                        draw(canvas)
-                        update()
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
+                if(surfaceActive){
+                    startTime = System.nanoTime()
                     try {
-                        surfaceHolder.unlockCanvasAndPost(canvas)
+                        canvas = surfaceHolder.lockCanvas()
+
+                        synchronized(surfaceHolder) {
+                            gameView.draw(canvas)
+                            draw(canvas)
+                            update()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    } finally {
+                        try {
+                            surfaceHolder.unlockCanvasAndPost(canvas)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    timeMillis = (System.nanoTime() - startTime) / 1000000
+                    waitTime = targetTime - timeMillis
+
+                    try {
+                        sleep(Math.max(0,waitTime))
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
-                timeMillis = (System.nanoTime() - startTime) / 1000000
-                waitTime = targetTime - timeMillis
+                else{
+                    startTime = System.nanoTime()
+                    update()
+                    timeMillis = (System.nanoTime() - startTime) / 1000000
+                    waitTime = targetTime - timeMillis
 
-                try {
-                    sleep(waitTime)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                    try {
+                        sleep(waitTime)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
-
     }
 
     fun update() {

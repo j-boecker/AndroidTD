@@ -1,84 +1,78 @@
 package com.example.towerdefense_v1
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.Resources
 import android.graphics.*
+import android.os.IBinder
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.Toast
 
 class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
 
-    private val thread: GameThread
+    var serviceStarted = false
     val backPaint = Paint()
-    var imagesArcher : MutableMap<String, Bitmap> = mutableMapOf()
-    var imagesCreep : MutableMap<String, Bitmap> = mutableMapOf()
     val imageGrass: Bitmap
     val paintBig = Paint()
     val paintLines = Paint()
     var screenWidth = Resources.getSystem().displayMetrics.widthPixels.toFloat()
     var screenHeight = Resources.getSystem().displayMetrics.heightPixels.toFloat()
+    lateinit var gameThread: GameThread
+
+    val serviceConn = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            this@GView.gameThread = ((binder as GameThread.GameServiceBinder).getService())
+            this@GView.gameThread.gameView = this@GView
+            this@GView.gameThread.surfaceHolder = this@GView.holder
+            if(!this@GView.gameThread.getRunning()){
+                this@GView.gameThread.setRunning(true)
+                this@GView.gameThread.innerThread.start()
+            }
+            this@GView.gameThread.surfaceActive = true
+            Toast.makeText(context, "service connected",Toast.LENGTH_SHORT)
+        }
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            Toast.makeText(context, "service disconnected",Toast.LENGTH_LONG)
+        }
+    }
+
 
     init {
 
         paintLines.color = Color.LTGRAY
         //paintLines.alpha = 100
-
         paintBig.isAntiAlias = true
         paintBig.isFilterBitmap = true
         paintBig.isDither = true
         backPaint.setColor(Color.RED)
         // putting the images in a map containing all bitmaps. Here a String Constant resource could be used to avoid spelling mistakes
-        imagesCreep.put(GConst.CREEP_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.creepright1))
-
-        imagesArcher.put(GConst.IDLE_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe1))
-        imagesArcher.put(GConst.IDLE_IMAGE2,  BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe2))
-        imagesArcher.put(GConst.PROJECTILE_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_arrow))
-        imagesArcher.put(GConst.SHADOW_IMAGE, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shadow))
-        imagesArcher.put(GConst.SHOOT_IMAGE1, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shoot1))
-        imagesArcher.put(GConst.SHOOT_IMAGE2, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shoot2))
-        imagesArcher.put(GConst.SHOOT_IMAGE3, BitmapFactory.decodeResource(ctx.resources, R.drawable.ashe_shoot3))
         imageGrass = BitmapFactory.decodeResource(ctx.resources, R.drawable.grass)
-
         holder.addCallback(this)
-        thread = GameThread(holder, this)
-
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
 
-        if (!thread.getRunning()){
-            thread.setRunning(true)
-            thread.innerThread.start()
-        }
+        if(!serviceStarted){
+            val startIntent = Intent(context, GameThread::class.java)
+            context.startService(startIntent)
+            serviceStarted = true
+            //bind service
 
-        thread.surfaceActive = true
-        Toast.makeText(
-            this@GView.context,
-            "v1.3 -- X: " + Resources.getSystem().displayMetrics.widthPixels + " Y: " + Resources.getSystem().displayMetrics.heightPixels,
-            Toast.LENGTH_LONG
-        ).show()
+        }
+        val bindIntent = Intent(context,GameThread::class.java)
+        context.bindService(bindIntent, serviceConn, Context.BIND_AUTO_CREATE)
 
     }
 
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-
-        thread.surfaceActive = false
-      /*  var retry = true
-        while (retry) {
-            try {
-                thread.setRunning(false)
-                thread.innerThread.join()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            retry = false
-        }*/
+       this@GView.gameThread.surfaceActive = false
+       context.unbindService(serviceConn)
     }
 
 

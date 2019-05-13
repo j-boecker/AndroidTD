@@ -9,31 +9,31 @@ class TowerArcher(images: Map<String, Bitmap>, x: Float, y: Float) : Tower(image
     var animTimer = 0
     var idle = true
     var matrix: Matrix = Matrix()
+    var currentBitmap = images[GConst.IDLE_IMAGE1] as Bitmap
 
     init {
-
         matrix.setTranslate(x * xPixScale*2f,y * yPixScale*2f)
         matrix.postScale(0.5f,0.5f)
-
     }
-
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        if (idle) {
-            when(animTimer)
-            {
-                in 0..49 ->  canvas.drawBitmap((images[GConst.IDLE_IMAGE1]) as Bitmap, matrix, null)
-                in 50..99->   canvas.drawBitmap(images[GConst.IDLE_IMAGE2] as Bitmap , matrix, null)
-                100 -> { canvas.drawBitmap(images[GConst.IDLE_IMAGE2] as Bitmap , matrix, null)
-                         animTimer = 0
-                        }
-            }
-        }
+        canvas.drawBitmap(currentBitmap, matrix, null)
     }
 
     override fun update() {
         super.update()
         animTimer++
+
+        if (idle) {
+            when(animTimer)
+            {
+                in 0..49 ->  currentBitmap = images[GConst.IDLE_IMAGE1] as Bitmap
+                in 50..99->   currentBitmap = images[GConst.IDLE_IMAGE2] as Bitmap
+                100 -> { currentBitmap = images[GConst.IDLE_IMAGE1] as Bitmap
+                    animTimer = 0
+                }
+            }
+        }
     }
 }
