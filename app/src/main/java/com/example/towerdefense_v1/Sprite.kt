@@ -10,14 +10,12 @@ import android.util.Log
 
 abstract class Sprite(val images: Map<String, Bitmap>, var x: Float, var y: Float) {
 
-
-    var w: Int = 0
-    var h: Int = 0
-    var width = 0
-    var height = 0
+    var width = 50f
+    var height = 50f
 
     protected var xFloat: Float = 0f
     protected var yFloat: Float = 0f
+    lateinit var currentBitmap: Bitmap
 
     var isDisposable = false
 
@@ -33,8 +31,8 @@ abstract class Sprite(val images: Map<String, Bitmap>, var x: Float, var y: Floa
 
     fun move(distanceX: Float, distanceY : Float){
         //save method to exceed grid boundaries with moving
-        x  = Math.max(Math.min(0f,x+distanceX),GConst.GRIDWIDTH.toFloat())
-        y  = Math.max(Math.min(0f,x+distanceY),GConst.GRIDWIDTH.toFloat())
+        x  = Math.min(Math.max(0f,x+distanceX),GConst.GRIDWIDTH.toFloat())
+        y  = Math.min(Math.max(0f,x+distanceY),GConst.GRIDWIDTH.toFloat())
     }
 
     abstract fun draw(canvas: Canvas)

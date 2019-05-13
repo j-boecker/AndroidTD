@@ -29,7 +29,7 @@ class GameThread() : Service() {
     var spriteList: MutableList<Sprite>
     var creepList: MutableList<Creep>
     var towerBuildGrid: Array<Array<Tower?>>
-
+    var garbageSpriteIndex = -1
 
     var imagesArcher: MutableMap<String, Bitmap> = mutableMapOf()
     var imagesCreep: MutableMap<String, Bitmap> = mutableMapOf()
@@ -121,18 +121,39 @@ class GameThread() : Service() {
     }
 
     fun update() {
+
         for (tList in towerBuildGrid) {
             for (tw in tList) {
                 tw?.update()
             }
         }
         for (s in spriteList) {
-            s.update()
+            if(s.isDisposable){
+             garbageSpriteIndex = spriteList.indexOf(s)
+            }
+            else{
+                s.update()
+            }
+        }
+        if(garbageSpriteIndex != -1){
+            spriteList.removeAt(garbageSpriteIndex)
+            garbageSpriteIndex = -1
         }
         for (c in creepList) {
-            c.update()
+
+            if(c.isDisposable){
+                garbageSpriteIndex = creepList.indexOf(c)
+            }
+            else{
+                c.update()
+            }
         }
-        //creepLoop()
+
+        if(garbageSpriteIndex != -1){
+           creepList.removeAt(garbageSpriteIndex)
+            garbageSpriteIndex = -1
+        }
+        creepLoop()
     }
 
     fun draw(canvas: Canvas) {
@@ -182,7 +203,7 @@ class GameThread() : Service() {
             Direction.UP,
             Direction.UP
         )
-        var creep = Creep(imagesCreep, 50f, 50f, 10f, 2f, path)
-        spriteList.add(creep)
+        var creep = Creep(imagesCreep, 50f, 50f, 30f, 2f, path)
+        creepList.add(creep)
     }
 }

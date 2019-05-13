@@ -5,17 +5,19 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 
 class TowerArcher(images: Map<String, Bitmap>, spriteList: MutableList<Sprite>,
-                  creepList: MutableList<Creep>, x: Float, y: Float) : Tower(images, x, y,10f,100f,spriteList,creepList) {
+                  creepList: MutableList<Creep>, x: Float, y: Float) : Tower(images,spriteList,creepList, x, y,50f,200f) {
 
     var animTimer = 0
     var idle = true
     var matrix: Matrix = Matrix()
-    var currentBitmap = images[GConst.IDLE_IMAGE1] as Bitmap
+
 
     init {
+        currentBitmap = images[GConst.IDLE_IMAGE1] as Bitmap
         matrix.setTranslate(x * xPixScale*2f,y * yPixScale*2f)
         matrix.postScale(0.5f,0.5f)
-        Globaltwo.x = 2
+        height = 40f
+        width = 40f
     }
 
     override fun draw(canvas: Canvas) {

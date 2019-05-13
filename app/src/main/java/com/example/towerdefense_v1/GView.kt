@@ -65,6 +65,13 @@ class GView(ctx: Context) : SurfaceView(ctx), SurfaceHolder.Callback {
         val bindIntent = Intent(context,GameThread::class.java)
         context.bindService(bindIntent, serviceConn, Context.BIND_AUTO_CREATE)
 
+        this.setOnTouchListener { view, motionEvent ->
+            var xGrid = (motionEvent.x/screenWidth)*GConst.TOWERGRIDWIDTH
+            var yGrid = (motionEvent.y/screenWidth)*GConst.TOWERGRIDWIDTH
+            this@GView.gameThread.createTower(xGrid.toInt(),yGrid.toInt(),"Archer")
+            true
+        }
+
     }
 
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {

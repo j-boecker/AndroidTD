@@ -1,8 +1,6 @@
 package com.example.towerdefense_v1
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Matrix
+import android.graphics.*
 
 
 class Creep(images: Map<String, Bitmap>, x : Float, y : Float, var hitPoints: Float, var speed: Float, var path: MutableList<Direction>) : Sprite(images,x,y) {
@@ -11,18 +9,26 @@ class Creep(images: Map<String, Bitmap>, x : Float, y : Float, var hitPoints: Fl
     var timer: Float = 0f
     var direction: Direction
     var pathPointer = 0
+    var lifebarPaint: Paint
     init {
+        lifebarPaint = Paint()
+        lifebarPaint.setColor(Color.GREEN)
+        lifebarPaint.setStyle(Paint.Style.FILL)
         matrix.setTranslate(x * xPixScale*2f,y * yPixScale*2f)
         matrix.postScale(0.5f,0.5f)
         direction = path.first()
     }
 
     override fun draw(canvas: Canvas) {
+        canvas.drawRect(x*xPixScale, y*yPixScale+10f, x*xPixScale+hitPoints*3, y*yPixScale-5, lifebarPaint )
         canvas.drawBitmap((images[GConst.CREEP_IMAGE1]) as Bitmap, matrix, null)
     }
 
     override fun update() {
         move()
+        if(hitPoints<=0){
+            this.isDisposable = true
+        }
     }
     fun takeDamage(damage: Float){
         hitPoints -= damage
